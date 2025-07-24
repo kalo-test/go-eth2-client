@@ -34,7 +34,7 @@ jobs:
           echo "Fetching tags locally from upstream"
           {
             echo "FETCH_RESULT<<EOF"
-            echo $(git fetch --tags upstream 2>&1)
+            echo "$(git fetch --tags upstream 2>&1)"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
           echo "Upstream tags fetched successfully"
