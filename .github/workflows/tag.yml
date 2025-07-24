@@ -50,8 +50,7 @@ jobs:
           fi
           # Work only with new tags, not branches
           echo "Filter only new tags"
-          NEW_TAGS=$(echo "${{ steps.fetch.outputs.FETCH_RESULT }}" | grep "\[new tag\]")
-          echo "New tags"
+          NEW_TAGS=$(echo "${{ steps.fetch.outputs.FETCH_RESULT }}" | grep "\[new tag\]") || grep_exit_code=$?; if [[ $grep_exit_code -ne 1 ]]; then (exit $grep_exit_code); fi
           echo "$NEW_TAGS"
           if [ -z "$NEW_TAGS" ]; then
             echo "No new tag found in upstream 🫧"
