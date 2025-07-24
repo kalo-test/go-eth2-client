@@ -86,7 +86,9 @@ jobs:
       - name: Tag obolnetwork/go-eth2-client
         id: tag_upstream
         run: |
-          echo "Pushing original tags from upstream to origin"
+          echo "Adding upstream repository"
+          git remote add upstream https://github.com/KaloyanTanev/go-eth2-client
+          echo $(git remote -v)
           echo "Fetching tags from upstream"
           git fetch --tags upstream
           echo "Fetched tags from upstream"
