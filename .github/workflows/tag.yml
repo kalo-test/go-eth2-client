@@ -10,9 +10,9 @@ permissions:
 jobs:
   fetch_latest_tag:
     runs-on: ubuntu-latest
-    outputs:
-      has_new_tag: ${{ steps.get_latest_tag.outputs.HAS_NEW_TAG }}
-      latest_tag: ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
+    # outputs:
+    #   has_new_tag: ${{ steps.get_latest_tag.outputs.HAS_NEW_TAG }}
+    #   latest_tag: ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
 
     steps:
       - name: Checkout
@@ -32,74 +32,74 @@ jobs:
           git fetch --tags
           echo "Origin tags fetched successfully"
           echo "Fetching tags locally from upstream"
-          {
-            echo "FETCH_RESULT<<EOF"
-            echo $(git fetch --tags upstream 2>&1)
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          git fetch --tags upstream
+          # {
+          #   echo "FETCH_RESULT<<EOF"
+          #   echo $(git fetch --tags upstream 2>&1)
+          #   echo "EOF"
+          # } >> "$GITHUB_OUTPUT"
           echo "Upstream tags fetched successfully"
 
-      - name: Evaluate result
-        id: get_latest_tag
-        run: |
-          echo "steps.fetch.outputs.FETCH_RESULT"
-          echo "${{ steps.fetch.outputs.FETCH_RESULT }}"
-          if [ -z "${{ steps.fetch.outputs.FETCH_RESULT }}" ]; then
-            echo "No new tag found in upstream 🫧"
-            echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Work only with new tags, not branches
-          echo "Filter only new tags"
-          NEW_TAGS=$(echo "${{ steps.fetch.outputs.FETCH_RESULT }}" | grep "\[new tag\]")
-          if [ -z "${NEW_TAGS}" ]; then
-            echo "No new tag found in upstream 🫧"
-            echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Get latest tag, as there may be multiple new tags
-          echo "Get latest tag"
-          LATEST_TAG=$(echo "$NEW_TAGS" | grep -Eo 'v[0-9]{1,}.[0-9]{1,}.[0-9]{1,}' | tail -1)
-          if [ -z "${LATEST_TAG}" ]; then
-            echo "No new tag found in upstream 🫧"
-            echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
-          else
-            echo "New tag found in upstream 📝"
-            echo "$LATEST_TAG"
-            echo "LATEST_TAG="${LATEST_TAG}"" >> "$GITHUB_OUTPUT"
-            echo "HAS_NEW_TAG='true'" >> "$GITHUB_OUTPUT"
-          fi
+  #     - name: Evaluate result
+  #       id: get_latest_tag
+  #       run: |
+  #         echo "${{ steps.fetch.outputs.FETCH_RESULT }}"
+  #         if [ -z "${{ steps.fetch.outputs.FETCH_RESULT }}" ]; then
+  #           echo "No new tag found in upstream 🫧"
+  #           echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
+  #           exit 0
+  #         fi
+  #         # Work only with new tags, not branches
+  #         echo "Filter only new tags"
+  #         NEW_TAGS=$(echo "${{ steps.fetch.outputs.FETCH_RESULT }}" | grep "\[new tag\]")
+  #         if [ -z "${NEW_TAGS}" ]; then
+  #           echo "No new tag found in upstream 🫧"
+  #           echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
+  #           exit 0
+  #         fi
+  #         # Get latest tag, as there may be multiple new tags
+  #         echo "Get latest tag"
+  #         LATEST_TAG=$(echo "$NEW_TAGS" | grep -Eo 'v[0-9]{1,}.[0-9]{1,}.[0-9]{1,}' | tail -1)
+  #         if [ -z "${LATEST_TAG}" ]; then
+  #           echo "No new tag found in upstream 🫧"
+  #           echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
+  #         else
+  #           echo "New tag found in upstream 📝"
+  #           echo "$LATEST_TAG"
+  #           echo "LATEST_TAG="${LATEST_TAG}"" >> "$GITHUB_OUTPUT"
+  #           echo "HAS_NEW_TAG='true'" >> "$GITHUB_OUTPUT"
+  #         fi
 
-  tag_obol:
-    runs-on: ubuntu-latest
-    needs: fetch_latest_tag
-    if: needs.fetch_latest_tag.outputs.has_new_tag == 'true'
+  # tag_obol:
+  #   runs-on: ubuntu-latest
+  #   needs: fetch_latest_tag
+  #   if: needs.fetch_latest_tag.outputs.has_new_tag == 'true'
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: opa-nov-mac
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         ref: opa-nov-mac
 
-      - name: Rebase branch obol
-        id: rebase
-        run: |
-          echo "Rebasing branch obol on tag ${needs.fetch_latest_tag.outputs.latest_tag}"
-          git fetch
-          {
-            echo "RESULT<<EOF"
-            echo $(git rebase ${needs.fetch_latest_tag.outputs.latest_tag} 2>&1)
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-          echo "Rebase completed"
+  #     - name: Rebase branch obol
+  #       id: rebase
+  #       run: |
+  #         echo "Rebasing branch obol on tag ${needs.fetch_latest_tag.outputs.latest_tag}"
+  #         git fetch
+  #         {
+  #           echo "RESULT<<EOF"
+  #           echo $(git rebase ${needs.fetch_latest_tag.outputs.latest_tag} 2>&1)
+  #           echo "EOF"
+  #         } >> "$GITHUB_OUTPUT"
+  #         echo "Rebase completed"
 
-      - name: Tag obolnetwork/go-eth2-client
-        id: tag
-        run: |
-          tag="${needs.fetch_latest_tag.outputs.latest_tag}+obol"
-          echo "Tagging new obolnetwork/go-eth2-client $tag"
-          git tag $tag
-          echo "Pushing new obolnetwork/go-eth2-client $tag tag"
-          git push --tags
-          echo "$tag tagged 🚀!"
+  #     - name: Tag obolnetwork/go-eth2-client
+  #       id: tag
+  #       run: |
+  #         tag="${needs.fetch_latest_tag.outputs.latest_tag}+obol"
+  #         echo "Tagging new obolnetwork/go-eth2-client $tag"
+  #         git tag $tag
+  #         echo "Pushing new obolnetwork/go-eth2-client $tag tag"
+  #         git push --tags
+  #         echo "$tag tagged 🚀!"
