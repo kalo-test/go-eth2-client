@@ -95,8 +95,9 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Rebase completed"
 
-      - name: Tag obolnetwork/go-eth2-client
-        id: tag
+      - name: Tag obolnetwork/go-eth2-client +obol
+        id: tag-obol
+        if: contains(steps.rebase.outputs.RESULT, 'Successfully rebased and updated') || contains(steps.rebase.outputs.RESULT, 'is up to date.')
         run: |
           tag="${{ needs.fetch_latest_tag.outputs.latest_tag }}+obol"
           echo "Tagging new obolnetwork/go-eth2-client $tag"
@@ -104,3 +105,33 @@ jobs:
           echo "Pushing new obolnetwork/go-eth2-client $tag tag"
           git push --tags
           echo "$tag tagged 🚀!"
+
+          echo "Pushing original tags from upstream to origin"
+          echo "Fetching tags from upstream"
+          git fetch --tags upstream
+          echo "Fetched tags from upstream"
+          echo "Pushing tags to origin"
+          git push --tags
+          echo "Successfully pushed upstream tags to origin 🚀!"
+
+      # - name: Rebase failed error
+      #   if: (contains(steps.rebase.outputs.RESULT, 'error:') || contains(steps.rebase.outputs.RESULT, 'fatal:')) && !contains(steps.rebase.outputs.RESULT, 'Merge conflict in')
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_CHANNEL: dev-stack-releases
+      #     SLACK_COLOR: eb3d2c #red
+      #     SLACK_ICON: https://obol.org/ObolIcon.png?ref=blog.obol.org
+      #     SLACK_MESSAGE: "Failed to rebase branch obol on newly tagged version ${{ needs.fetch_latest_tag.outputs.latest_tag }} due to error"
+      #     SLACK_TITLE: "go-eth2-client rebase failed - error"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_DEV_STACK_RELEASES_WEBHOOK }}
+
+      # - name: Rebase failed conflict
+      #   if: contains(steps.rebase.outputs.RESULT, 'Merge conflict in')
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_CHANNEL: dev-stack-releases
+      #     SLACK_COLOR: ecc926 #yellow
+      #     SLACK_ICON: https://obol.org/ObolIcon.png?ref=blog.obol.org
+      #     SLACK_MESSAGE: "Failed to rebase branch obol on newly tagged version ${{ needs.fetch_latest_tag.outputs.latest_tag }} due to conflicts"
+      #     SLACK_TITLE: "go-eth2-client rebase failed - conflicts"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_DEV_STACK_RELEASES_WEBHOOK }}
