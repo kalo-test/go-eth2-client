@@ -63,12 +63,12 @@ jobs:
           LATEST_TAG=$(echo "$NEW_TAGS" | grep -Eo 'v[0-9]{1,}.[0-9]{1,}.[0-9]{1,}' | tail -1)
           if [ -z "$LATEST_TAG" ]; then
             echo "No new tag found in upstream 🫧"
-            echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
+            echo "HAS_NEW_TAG=false" >> "$GITHUB_OUTPUT"
           else
-            echo "New tag found in upstream 📝"
+            echo "New latest tag found in upstream 📝"
             echo "$LATEST_TAG"
             echo "LATEST_TAG="${LATEST_TAG}"" >> "$GITHUB_OUTPUT"
-            echo "HAS_NEW_TAG='true'" >> "$GITHUB_OUTPUT"
+            echo "HAS_NEW_TAG=true" >> "$GITHUB_OUTPUT"
           fi
 
   tag_obol:
@@ -81,7 +81,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: opa-nov-mac
+          ref: obol
 
       - name: Rebase branch obol
         id: rebase
