@@ -24,7 +24,7 @@ jobs:
         id: fetch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPSTREAM: https://github.com/KaloyanTanev/go-eth2-client
+          UPSTREAM: https://github.com/KaloyanTanev/go-eth2-client.git
         run: |
           echo "Fetching tags from upstream"
           echo $(git remote -v)
