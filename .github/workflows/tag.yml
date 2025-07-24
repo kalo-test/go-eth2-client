@@ -25,16 +25,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Fetching tags from upstream"
+          echo "Adding upstream repository"
           git remote add upstream https://github.com/KaloyanTanev/go-eth2-client
           echo $(git remote -v)
-          echo $(git tag -l)
+          echo "Fetching tags locally from origin"
+          git fetch --tags
+          echo "Origin tags fetched successfully"
+          echo "Fetching tags locally from upstream"
           {
             echo "FETCH_RESULT<<EOF"
             echo $(git fetch --tags upstream 2>&1)
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-          echo "Fetch completed"
+          echo "Upstream tags fetched successfully"
 
       - name: Evaluate result
         id: get_latest_tag
