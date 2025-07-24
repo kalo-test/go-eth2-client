@@ -62,6 +62,7 @@ jobs:
             echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
           else
             echo "New tag found in upstream 📝"
+            echo "$LATEST_TAG"
             echo "LATEST_TAG="${LATEST_TAG}"" >> "$GITHUB_OUTPUT"
             echo "HAS_NEW_TAG='true'" >> "$GITHUB_OUTPUT"
           fi
