@@ -71,6 +71,13 @@ jobs:
             echo "HAS_NEW_TAG=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Sync upstream tags
+        id: sync_upstream_tags
+        run: |
+          echo "Pushing tags to origin"
+          git push --tags
+          echo "Successfully pushed upstream tags to origin 🚀!"
+
   tag_obol:
     runs-on: ubuntu-latest
     needs: fetch_latest_tag
@@ -82,19 +89,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: obol
-
-      - name: Tag obolnetwork/go-eth2-client
-        id: tag_upstream
-        run: |
-          echo "Adding upstream repository"
-          git remote add upstream https://github.com/KaloyanTanev/go-eth2-client
-          echo $(git remote -v)
-          echo "Fetching tags from upstream"
-          git fetch --tags upstream
-          echo "Fetched tags from upstream"
-          echo "Pushing tags to origin"
-          git push --tags
-          echo "Successfully pushed upstream tags to origin 🚀!"
 
       - name: Rebase branch obol
         id: rebase
