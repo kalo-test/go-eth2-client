@@ -48,7 +48,7 @@ jobs:
           fi
           # Work only with new tags, not branches
           echo "Filter only new tags"
-          NEW_TAGS=$(echo ${{ steps.fetch.outputs.FETCH_RESULT }} | grep "\[new tag\]")
+          NEW_TAGS=$(echo "${{ steps.fetch.outputs.FETCH_RESULT }}" | grep "\[new tag\]")
           if [ -z "${NEW_TAGS}" ]; then
             echo "No new tag found in upstream 🫧"
             echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
@@ -56,13 +56,13 @@ jobs:
           fi
           # Get latest tag, as there may be multiple new tags
           echo "Get latest tag"
-          LATEST_TAG=$(echo $NEW_TAGS | grep -Eo 'v[0-9]{1,}.[0-9]{1,}.[0-9]{1,}' | tail -1)
+          LATEST_TAG=$(echo "$NEW_TAGS" | grep -Eo 'v[0-9]{1,}.[0-9]{1,}.[0-9]{1,}' | tail -1)
           if [ -z "${LATEST_TAG}" ]; then
             echo "No new tag found in upstream 🫧"
             echo "HAS_NEW_TAG='false'" >> "$GITHUB_OUTPUT"
           else
             echo "New tag found in upstream 📝"
-            echo "LATEST_TAG=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+            echo "LATEST_TAG="${LATEST_TAG}"" >> "$GITHUB_OUTPUT"
             echo "HAS_NEW_TAG='true'" >> "$GITHUB_OUTPUT"
           fi
 
