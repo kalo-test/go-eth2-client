@@ -103,7 +103,7 @@ jobs:
           git fetch
           {
             echo "RESULT<<EOF"
-            echo $(git rebase upstream/${{ needs.fetch_latest_tag.outputs.latest_tag }} 2>&1)
+            echo $(git rebase ${{ needs.fetch_latest_tag.outputs.latest_tag }} 2>&1)
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
           echo "Rebase completed"
