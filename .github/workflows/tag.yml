@@ -72,12 +72,11 @@ jobs:
           fi
 
       - name: Sync upstream tags
-        id: sync_upstream_tags
         if: steps.get_latest_tag.outputs.HAS_NEW_TAG == 'true'
         run: |
           echo "Pushing tags to origin"
           git push --tags
-          echo "Successfully pushed upstream tags to origin 🚀!"
+          echo "Successfully synced upstream tags with origin 🚀!"
 
   tag_obol:
     runs-on: ubuntu-latest
@@ -98,18 +97,12 @@ jobs:
           git fetch
           {
             echo "RESULT<<EOF"
-            echo $(git rebase ${{ needs.fetch_latest_tag.outputs.latest_tag }} 2>&1)
+            echo "$(git rebase --onto $(echo $(git log -n 1 --pretty=format:"%H" ${{ needs.fetch_latest_tag.outputs.latest_tag }} )) $(echo $(git log -n 1 --pretty=format:"%H" master)) obol 2>&1)"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
           echo "Rebase completed"
 
-      - name: Print
-        id: print_result
-        run: |
-          echo "${{ steps.rebase.outputs.RESULT }}"
-
       - name: Tag obolnetwork/go-eth2-client
-        id: tag_obol
         if: contains(steps.rebase.outputs.RESULT, 'Successfully rebased and updated') || contains(steps.rebase.outputs.RESULT, 'is up to date.')
         run: |
           tag="${{ needs.fetch_latest_tag.outputs.latest_tag }}+obol"
